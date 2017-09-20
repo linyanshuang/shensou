@@ -22,6 +22,7 @@ public class WebSearch implements Callable<Result> {
 	private String query;
 	private int page;
 	private String tokenURL = MyProperty.getKey("web.search.gettoken.url");
+	private String tokenPIX = MyProperty.getKey("web.search.gettoken.pix");
 	private final String URL = MyProperty
 			.getKey("web.search.url");
 
@@ -82,9 +83,12 @@ public class WebSearch implements Callable<Result> {
 		try {
 			log.info("refresh token...");
 			dom = (Document) Jsoup.connect(tokenURL).timeout(SOCKECT_TIMEOUT).get();
-			if(dom.text().contains("\"cse_token\":\"")){
-				cse_tok = dom.text().split("\"cse_token\":\"")[1].split("\"")[0];
+			if(dom.text().contains(tokenPIX)){
+				cse_tok = dom.text().split(tokenPIX)[1].split("\"")[0];
 				log.info("refresh token ok,cse_tok = "+cse_tok);
+			}
+			if(cse_tok == null){
+				throw new RuntimeException("cse_tok is null");
 			}
 		} catch (Exception e) {
 			log.error(e);
